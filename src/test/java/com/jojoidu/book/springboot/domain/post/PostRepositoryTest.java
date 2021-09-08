@@ -1,4 +1,4 @@
-package com.jojoidu.book.springboot.domain.posts;
+package com.jojoidu.book.springboot.domain.post;
 
 import junit.framework.TestCase;
 import org.junit.After;

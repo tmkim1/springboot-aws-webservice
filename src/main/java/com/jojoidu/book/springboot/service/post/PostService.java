@@ -2,6 +2,7 @@ package com.jojoidu.book.springboot.service.post;
 
 import com.jojoidu.book.springboot.domain.post.Post;
 import com.jojoidu.book.springboot.domain.post.PostRepository;
+import com.jojoidu.book.springboot.web.dto.PostListResponseDto;
 import com.jojoidu.book.springboot.web.dto.PostResponseDto;
 import com.jojoidu.book.springboot.web.dto.PostSaveRequestDto;
 import com.jojoidu.book.springboot.web.dto.PostUpdateRequestDto;
@@ -9,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.PostUpdate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -35,5 +37,12 @@ public class PostService {
         Post entity = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id = " + id));
         return new PostResponseDto(entity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> findAllDesc() {
+        return postRepository.findAllDesc().stream()
+                .map(PostListResponseDto::new)
+                .collect(Collectors.toList());
     }
 }

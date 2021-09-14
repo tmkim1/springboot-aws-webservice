@@ -5,6 +5,13 @@
         <div class="row">
             <div class="col-md-6">
                 <a href="/post/save" role="button" class="btn btn-primary">글 등록</a>
+                {{#userName}} <!--Mustache는 if문을 제공하지 않고, true false만을 판단 하기 때문에 최종값으로 구분-->
+                    Logged in as: <span id="user">{{userName}}</span>
+                    <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+                {{/userName}}
+                {{^userName}}
+                    <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+                {{/userName}}
             </div>
         </div>
         <br>

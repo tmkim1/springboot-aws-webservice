@@ -53,12 +53,28 @@ public class Order{
 
 url: https://aws.amazon.com/ko/
 
-가입 후, 기본 플랜 선택 
+- 가입 후, 기본 플랜 선택 
 
 **EC2 인스턴스 생성** 
 
-EC2는 AWS에서 제공하는 성능, 용량 등을 유동적으로 사용할 수 있는 서버
+- EC2는 AWS에서 제공하는 성능, 용량 등을 유동적으로 사용할 수 있는 서버
+- 무료 프리티어 플랜에서의 사양: vCPU(가상 cpu) 1 Core, 메로리 1GB // 월 750 시간 제한 
+- 리전: 서울 선택 
 
-무료 프리티어 플랜에서의 사양: vCPU(가상 cpu) 1 Core, 메로리 1GB // 월 750 시간 제한 
+[고정 IP 할당 및 ssh key 복사 ]
+- AWS의 고정 IP를 Elastic IP(EIP,탄력적 IP)라고 한다. 
+- ssh 접속시: "ssh -i pem 키 위치 탄력적 IP 주소" 해당 명령어를 매번 수행해야함
+  - pem 키 파일을 자동으로 읽어 오도록 ~/.ssh/ 위치에 해당 키 파일을 복사 (cp springboot-webservice.pem ~/.ssh) 
+  - 탄력적 IP를 생성하고 할당하지 않은 경우 비용이 발생하기 때문에 꼭 할당하거나, 사용하지 않는다면 삭제 처리 
 
-리전: 서울 선택 
+  - config 생성 
+  ```shell
+  # springboot-webservice
+    Host springboot-webservice
+    HostName 3.00.000.00 (본인 생성 ip)
+    User ec2-user
+    IdentityFile ~/.ssh/springboot-webservice.pem
+  ```
+  
+  
+

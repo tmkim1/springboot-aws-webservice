@@ -76,5 +76,51 @@ url: https://aws.amazon.com/ko/
     IdentityFile ~/.ssh/springboot-webservice.pem
   ```
   
-  
+[아마존 리눅스 서버 생성시 꼭 해야 할 설정들]
+1. JAVA8 설치 
+```shell
+# 자바 1.8 설치 
+sudo yum install -y java-1.8.0-openjdk-devel.x86_64
+# 자바 버전 선택 
+sudo /usr/sbin/alternatives --config java 
+```
+2. 타임존 변경: 미국 시간대 -> 한국 시간대 
+```shell
+sudo rm /etc/localtime
+sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+```
+3. 호스트네임 변경: 현재 접속한 서버의 별명을 등록
+```shell
+sudo vim /etc/sysconfig/network
+HOSTNAME=서비스명 기입 
+
+sudo vim /etc/hosts
+127.0.0.1 서비스명
+```
+**AWS 데이터이스 환경 셋팅**
+- MariaDB (추후 AWS에서 운영하는 Aurora 교체 용이)
+- 프리티어 템플릿 
+
+[파라미터 그룹 생성]
+- time_zone		Asia/Seoul	
+- character_set_client		utf8mb4	
+- character_set_connection		utf8mb4	
+- character_set_database		utf8mb4	
+- character_set_filesystem		utf8mb4	
+- character_set_results		utf8mb4	
+- character_set_server		utf8mb4	
+- collation_connection		utf8mb4_general_ci	
+- collation_server		utf8mb4_general_ci	
+- max_connections 150
+
+[데이터베이스 파라미터 값 직접 변경] 
+```sql
+ALTER DATABASE freelec
+CHARACTER SET = 'utf8mb4'
+COLLATE = 'utf8mb4_general_ci';
+```
+
+
+
+
 

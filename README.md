@@ -120,6 +120,81 @@ CHARACTER SET = 'utf8mb4'
 COLLATE = 'utf8mb4_general_ci';
 ```
 
+**EC2 서버에 프로젝트 배포**
+
+```shell
+#git 설치 
+sudo yum install git
+
+#git version 확인 
+git --version 
+
+#디렉토리 생성 
+mkdir ~/app && mkdir ~/app/step1
+
+#생성된 디렉토리로 이동 
+cd ~/app/step1 
+
+#project 복사 
+git clone 깃 리파지토리 주소 
+
+#test 
+./gradlew test 
+```
+
+[배포 스크립트 만들기] 
+- git clone혹은 git pull을 통해서 새 버전의 프로젝트 받음
+- Gradle이나 Maven을 통해 프로젝트 테스트와 빌드
+- EC2 서버에서 해당 프로젝트 실행 및 재실행 
+
+
+```shell
+#!/bin/bash
+
+REPOSITORY=/home/ec2-user/app/step1
+PROJECT_NAME=springboot-aws-webservice
+
+cd $REPOSITORY/$PROJECT_NAME
+
+echo ">Git Pull"
+
+git pull
+
+echo "> 프로젝트 build 시작"
+
+./gradlew build
+
+echo "> step1 디렉토리 이동"
+
+cd $REPOSITORY
+
+echo "> Build 파일 복사"
+
+cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
+
+echo "> 현재 구동중인 애플리케이션 pid 확인"
+
+CURRENT_PID=${pgrep -f ${PROJECT_NAME}.*.jar}
+
+echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
+
+if [ -z "$CURRENT_PID" ]; then
+        echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+        echo "> kill -15 $CURRENT_PID"
+        kill -15 $CURRENT_PID
+        sleep 5
+fi
+
+echo "> 새 애플리케이션 배포"
+
+JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
+
+echo "> JAR Name: $JAR_NAME"
+
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+```
+
 
 
 

@@ -24,6 +24,10 @@ repositories {
     jcenter()
 }
 
+bootJar {
+    mainClassName = 'com.jojoidu.book.springboot'
+}
+
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.projectlombok:lombok')

@@ -45,3 +45,157 @@ public class Order{
 
 ```
 
+-------------------
+
+# AWS
+
+**회원가입** 
+
+url: https://aws.amazon.com/ko/
+
+- 가입 후, 기본 플랜 선택 
+
+**EC2 인스턴스 생성** 
+
+- EC2는 AWS에서 제공하는 성능, 용량 등을 유동적으로 사용할 수 있는 서버
+- 무료 프리티어 플랜에서의 사양: vCPU(가상 cpu) 1 Core, 메로리 1GB // 월 750 시간 제한 
+- 리전: 서울 선택 
+
+[고정 IP 할당 및 ssh key 복사 ]
+- AWS의 고정 IP를 Elastic IP(EIP,탄력적 IP)라고 한다. 
+- ssh 접속시: "ssh -i pem 키 위치 탄력적 IP 주소" 해당 명령어를 매번 수행해야함
+  - pem 키 파일을 자동으로 읽어 오도록 ~/.ssh/ 위치에 해당 키 파일을 복사 (cp springboot-webservice.pem ~/.ssh) 
+  - 탄력적 IP를 생성하고 할당하지 않은 경우 비용이 발생하기 때문에 꼭 할당하거나, 사용하지 않는다면 삭제 처리 
+
+  - config 생성 
+  ```shell
+  # springboot-webservice
+    Host springboot-webservice
+    HostName 3.00.000.00 (본인 생성 ip)
+    User ec2-user
+    IdentityFile ~/.ssh/springboot-webservice.pem
+  ```
+  
+[아마존 리눅스 서버 생성시 꼭 해야 할 설정들]
+1. JAVA8 설치 
+```shell
+# 자바 1.8 설치 
+sudo yum install -y java-1.8.0-openjdk-devel.x86_64
+# 자바 버전 선택 
+sudo /usr/sbin/alternatives --config java 
+```
+2. 타임존 변경: 미국 시간대 -> 한국 시간대 
+```shell
+sudo rm /etc/localtime
+sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+```
+3. 호스트네임 변경: 현재 접속한 서버의 별명을 등록
+```shell
+sudo vim /etc/sysconfig/network
+HOSTNAME=서비스명 기입 
+
+sudo vim /etc/hosts
+127.0.0.1 서비스명
+```
+**AWS 데이터이스 환경 셋팅**
+- MariaDB (추후 AWS에서 운영하는 Aurora 교체 용이)
+- 프리티어 템플릿 
+
+[파라미터 그룹 생성]
+- time_zone		Asia/Seoul	
+- character_set_client		utf8mb4	
+- character_set_connection		utf8mb4	
+- character_set_database		utf8mb4	
+- character_set_filesystem		utf8mb4	
+- character_set_results		utf8mb4	
+- character_set_server		utf8mb4	
+- collation_connection		utf8mb4_general_ci	
+- collation_server		utf8mb4_general_ci	
+- max_connections 150
+
+[데이터베이스 파라미터 값 직접 변경] 
+```sql
+ALTER DATABASE freelec
+CHARACTER SET = 'utf8mb4'
+COLLATE = 'utf8mb4_general_ci';
+```
+
+**EC2 서버에 프로젝트 배포**
+
+```shell
+#git 설치 
+sudo yum install git
+
+#git version 확인 
+git --version 
+
+#디렉토리 생성 
+mkdir ~/app && mkdir ~/app/step1
+
+#생성된 디렉토리로 이동 
+cd ~/app/step1 
+
+#project 복사 
+git clone 깃 리파지토리 주소 
+
+#test 
+./gradlew test 
+```
+
+[배포 스크립트 만들기] 
+- git clone혹은 git pull을 통해서 새 버전의 프로젝트 받음
+- Gradle이나 Maven을 통해 프로젝트 테스트와 빌드
+- EC2 서버에서 해당 프로젝트 실행 및 재실행 
+
+
+```shell
+#!/bin/bash
+
+REPOSITORY=/home/ec2-user/app/step1
+PROJECT_NAME=springboot-aws-webservice
+
+cd $REPOSITORY/$PROJECT_NAME
+
+echo ">Git Pull"
+
+git pull
+
+echo "> 프로젝트 build 시작"
+
+./gradlew build
+
+echo "> step1 디렉토리 이동"
+
+cd $REPOSITORY
+
+echo "> Build 파일 복사"
+
+cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
+
+echo "> 현재 구동중인 애플리케이션 pid 확인"
+
+CURRENT_PID=${pgrep -f ${PROJECT_NAME}.*.jar}
+
+echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
+
+if [ -z "$CURRENT_PID" ]; then
+        echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+        echo "> kill -15 $CURRENT_PID"
+        kill -15 $CURRENT_PID
+        sleep 5
+fi
+
+echo "> 새 애플리케이션 배포"
+
+JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
+
+echo "> JAR Name: $JAR_NAME"
+
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+```
+
+
+
+
+

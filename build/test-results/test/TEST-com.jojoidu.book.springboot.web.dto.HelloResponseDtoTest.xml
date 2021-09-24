@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.jojoidu.book.springboot.web.dto.HelloResponseDtoTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-09-24T05:38:24" hostname="gimtaemin-ui-MacBookAir.local" time="0.001">
-  <properties/>
-  <testcase name="test" classname="com.jojoidu.book.springboot.web.dto.HelloResponseDtoTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

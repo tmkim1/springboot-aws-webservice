@@ -25,7 +25,7 @@ repositories {
 }
 
 bootJar {
-    mainClassName = 'com.jojoidu.book.springboot'
+    mainClassName = 'com.jojoidu.book.springboot.application'
 }
 
 dependencies {

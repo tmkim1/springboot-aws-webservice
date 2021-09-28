@@ -24,10 +24,6 @@ repositories {
     jcenter()
 }
 
-bootJar {
-    mainClassName = 'com.jojoidu.book.springboot.application'
-}
-
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.projectlombok:lombok')
@@ -36,6 +32,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-oauth2-client')
     compile('org.springframework.session:spring-session-jdbc')
     compile('com.h2database:h2')
+    compile('org.mariadb.jdbc:mariadb-java-client')
     annotationProcessor('org.projectlombok:lombok')
     testImplementation 'junit:junit:4.13.1'
     testCompile('org.springframework.boot:spring-boot-starter-test')

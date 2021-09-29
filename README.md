@@ -156,7 +156,7 @@ PROJECT_NAME=springboot-aws-webservice
 
 cd $REPOSITORY/$PROJECT_NAME
 
-echo ">Git Pull"
+echo ">Git Pullu"
 
 git pull
 
@@ -174,7 +174,7 @@ cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
 
 echo "> 현재 구동중인 애플리케이션 pid 확인"
 
-CURRENT_PID=${pgrep -f ${PROJECT_NAME}.*.jar}
+CURRENT_PID=$(pgrep -f ${PROJECT_NAME}.*.jar)
 
 echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
 
@@ -192,7 +192,11 @@ JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+sudo nohup java -jar \
+        -Dspring.config.location=classpath:/application.properties,/home/ec2-user/app/application-oauth.properties,/home/ec2-user/app/application-real-db.properties,/classpath:/application-real.properties \
+  -Dspring.profiles.active=real \
+  $REPOSITORY/$JAR_NAME 2>&1 &
+
 ```
 
 

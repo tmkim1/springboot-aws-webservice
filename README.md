@@ -49,6 +49,9 @@ public class Order{
 
 # AWS
 
+   클라우드 컴퓨팅이란 IT 리소스를 인터넷을 통해 온디맨드로 제공하고 사용한 만큼만 비용을 지불하는 것  을 말한다. 
+   물리적 데이터 센터와 서버를 구입, 소유 및 유지 관리 대신 -> Amazon Web Services(AWS)와   같은 클라우드 공급자로부터 필요에 따라 컴퓨팅 파워, 스토리지, 데이터베이스와 같은 기술 서비스에 액세스할 수 있다. 
+
 **회원가입** 
 
 url: https://aws.amazon.com/ko/
@@ -198,6 +201,10 @@ sudo nohup java -jar \
   $REPOSITORY/$JAR_NAME 2>&1 &
 
 ```
+
+[AWS 보안 그룹 설정]
+ec2 보안 그룹 - 인바운드 규칙: 설정 사용 PORT 허용 
+
 
 
 

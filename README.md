@@ -214,6 +214,62 @@ API 및 서비스 -> 사용자 인증 정보 -> OAuth 동의 화면 접속
 사용자 인증 정보 
 리디렉션 URL란에 퍼블릭 DNS 주소 + /login/oauth2/code/google 입력 
 ```
+4. 네이버 개발자 센터 접속 (https://developers.naver.com/apps/#/myapps/)
+
+```
+내 애플리케이션 -> API설정 
+서비스 URL
+Callback URL: DNS 주소로 변경 
+```
+
+#Travis CI 배포 자동화 
+
+[CI] 
+Continuous Integration - 지속적 통합, 코드 버전 관리를 하는 VCS 시스템(Git, SVC 등)에 PUSH가 되면 자동으로 테스트와 빌드가 수행되어 안정적인 배포 파일을 만드는 과정
+CI 4가지 규칙 (마틴 파울러: http://bit.ly/2Yv0vFp)
+- 모든 소스 코드가 살아 있고(현재 실행되고) 누구든 현재의 소스에 접근할 수 있는 단일 지점을 유지할 것
+- 빌드 프로세스를 자동화해서 누구든 소스로부터 시스템을 빌드하는 단일 명령어를 사용할 수 있게 할 것
+- 테스팅을 자동화해서 단일 명령어로 언제든지 시스템에 대한 건전한 테스트 수트를 실행할 수 있게 할 것 
+- 누구나 현재 실행 파일을 얻으려면 지금까지 완전한 실행 파일을 얻었다는 확신을 하게 할 것 
+- 
+[CD]
+Continuous Deployment - 지속적인 배포, 빌드 결과를 자동으로 운영 서버에 무중단 배포까지 진행되는 과정
+
+[Travis CI 연동하기] 
+
+https://travis-ci.com/ 깃허브 계정 로그인 -> 계정명 Settings 클릭 -> CI 연동 활성화 할 프로젝트 선택 
+Travis CI의 상세한 설정은 프로젝트에 존재하는 .travis.yml 파일로 관리
+
+build.gradle과 같은 경로에 .travis.yml 파일 생성 
+
+```yml
+language: java
+jdk:
+  - openjdk8
+
+branches:
+  only:
+    - master
+
+
+# Travis CI 서버의 Home
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script: "./gradlew clean build"
+
+# CI 실행 완료 시 메일로 알람
+notifications: 
+  email:
+    recipients: 
+      - 본인 메일 주소 
+```
+ㅠㅕㅑ
+
+
+
 
 
 

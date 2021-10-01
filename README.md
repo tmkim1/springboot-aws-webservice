@@ -279,6 +279,8 @@ IAM: AWS에서 제공하는 서비스의 접근 방식과 권한을 관리 (Trav
   - AWS_ACCESS_KEY
   - AWS_SECRET_KEY
 
+S3 버킷 생성 (모든 퍼블릭 액세스 차단) 
+  
 
 
 

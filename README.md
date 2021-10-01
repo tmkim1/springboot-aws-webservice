@@ -49,6 +49,9 @@ public class Order{
 
 # AWS
 
+   클라우드 컴퓨팅이란 IT 리소스를 인터넷을 통해 온디맨드로 제공하고 사용한 만큼만 비용을 지불하는 것  을 말한다. 
+   물리적 데이터 센터와 서버를 구입, 소유 및 유지 관리 대신 -> Amazon Web Services(AWS)와   같은 클라우드 공급자로부터 필요에 따라 컴퓨팅 파워, 스토리지, 데이터베이스와 같은 기술 서비스에 액세스할 수 있다. 
+
 **회원가입** 
 
 url: https://aws.amazon.com/ko/
@@ -156,7 +159,7 @@ PROJECT_NAME=springboot-aws-webservice
 
 cd $REPOSITORY/$PROJECT_NAME
 
-echo ">Git Pull"
+echo ">Git Pullu"
 
 git pull
 
@@ -174,7 +177,7 @@ cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
 
 echo "> 현재 구동중인 애플리케이션 pid 확인"
 
-CURRENT_PID=${pgrep -f ${PROJECT_NAME}.*.jar}
+CURRENT_PID=$(pgrep -f ${PROJECT_NAME}.*.jar)
 
 echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
 
@@ -192,8 +195,83 @@ JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+sudo nohup java -jar \
+        -Dspring.config.location=classpath:/application.properties,/home/ec2-user/app/application-oauth.properties,/home/ec2-user/app/application-real-db.properties,/classpath:/application-real.properties \
+  -Dspring.profiles.active=real \
+  $REPOSITORY/$JAR_NAME 2>&1 &
+
 ```
+
+[EC2에서 소셜 로그인 연동]
+
+1. EC2 보안 그룹 설정- 인바운드 규칙: 설정 사용 PORT 허용
+2. EC2 퍼블릭 도메인 연동 (퍼블릭 DNS: 임시 자동으로 할당된 도메인, 인터넷이 되는 장소 어디나 이 주소를 입력하면 EC2 서버에 접근 가능)
+3. 구글 클라우드 플랫폼 접속 (https://console.cloud.google.com/)
+```
+API 및 서비스 -> 사용자 인증 정보 -> OAuth 동의 화면 접속 
+승인된 도메인란에 퍼블릭 DNS 주소 입력
+
+사용자 인증 정보 
+리디렉션 URL란에 퍼블릭 DNS 주소 + /login/oauth2/code/google 입력 
+```
+4. 네이버 개발자 센터 접속 (https://developers.naver.com/apps/#/myapps/)
+
+```
+내 애플리케이션 -> API설정 
+서비스 URL
+Callback URL: DNS 주소로 변경 
+```
+
+#Travis CI 배포 자동화 
+
+[CI] 
+Continuous Integration - 지속적 통합, 코드 버전 관리를 하는 VCS 시스템(Git, SVC 등)에 PUSH가 되면 자동으로 테스트와 빌드가 수행되어 안정적인 배포 파일을 만드는 과정
+CI 4가지 규칙 (마틴 파울러: http://bit.ly/2Yv0vFp)
+- 모든 소스 코드가 살아 있고(현재 실행되고) 누구든 현재의 소스에 접근할 수 있는 단일 지점을 유지할 것
+- 빌드 프로세스를 자동화해서 누구든 소스로부터 시스템을 빌드하는 단일 명령어를 사용할 수 있게 할 것
+- 테스팅을 자동화해서 단일 명령어로 언제든지 시스템에 대한 건전한 테스트 수트를 실행할 수 있게 할 것 
+- 누구나 현재 실행 파일을 얻으려면 지금까지 완전한 실행 파일을 얻었다는 확신을 하게 할 것 
+- 
+[CD]
+Continuous Deployment - 지속적인 배포, 빌드 결과를 자동으로 운영 서버에 무중단 배포까지 진행되는 과정
+
+[Travis CI 연동하기] 
+
+https://travis-ci.com/ 깃허브 계정 로그인 -> 계정명 Settings 클릭 -> CI 연동 활성화 할 프로젝트 선택 
+Travis CI의 상세한 설정은 프로젝트에 존재하는 .travis.yml 파일로 관리
+
+build.gradle과 같은 경로에 .travis.yml 파일 생성 
+
+```yml
+language: java
+jdk:
+  - openjdk8
+
+branches:
+  only:
+    - master
+
+
+# Travis CI 서버의 Home
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script: "./gradlew clean build"
+
+# CI 실행 완료 시 메일로 알람
+notifications: 
+  email:
+    recipients: 
+      - 본인 메일 주소 
+```
+ㅠㅕㅑ
+
+
+
+
+
 
 
 

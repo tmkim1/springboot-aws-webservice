@@ -225,14 +225,16 @@ Callback URL: DNS 주소로 변경
 #Travis CI 배포 자동화 
 
 [CI] 
+
 Continuous Integration - 지속적 통합, 코드 버전 관리를 하는 VCS 시스템(Git, SVC 등)에 PUSH가 되면 자동으로 테스트와 빌드가 수행되어 안정적인 배포 파일을 만드는 과정
 CI 4가지 규칙 (마틴 파울러: http://bit.ly/2Yv0vFp)
 - 모든 소스 코드가 살아 있고(현재 실행되고) 누구든 현재의 소스에 접근할 수 있는 단일 지점을 유지할 것
 - 빌드 프로세스를 자동화해서 누구든 소스로부터 시스템을 빌드하는 단일 명령어를 사용할 수 있게 할 것
 - 테스팅을 자동화해서 단일 명령어로 언제든지 시스템에 대한 건전한 테스트 수트를 실행할 수 있게 할 것 
 - 누구나 현재 실행 파일을 얻으려면 지금까지 완전한 실행 파일을 얻었다는 확신을 하게 할 것 
-- 
+ 
 [CD]
+
 Continuous Deployment - 지속적인 배포, 빌드 결과를 자동으로 운영 서버에 무중단 배포까지 진행되는 과정
 
 [Travis CI 연동하기] 
@@ -280,8 +282,33 @@ IAM: AWS에서 제공하는 서비스의 접근 방식과 권한을 관리 (Trav
   - AWS_SECRET_KEY
 
 S3 버킷 생성 (모든 퍼블릭 액세스 차단) 
-  
 
+.travis.yml 코드 추가 
+
+```yml
+
+#Travis VI에서 빌드하여 만든 Jar파일 -> S3 업로드
+before_deploy:
+  - zip -r springboot-webservice
+  - mkdir -p deploy
+  - mv springboot-webservice.zip delpoy/springboot-webservice.zip
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY # Travis repo settings에 설정된 값
+    bucket: freelec-springboot-tm-build # S3 버킷
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private # zip 파일 접근을 private으로
+    local_dir: deploy # before_deploy에서 생성한 디렉토리
+    wait-until-deployed: true
+
+```
+
+IAM 역할 생성 (AWS 서비스 - EC2) 
+
+인스턴스 -> 보안 -> IAM 역할 수정 -> 인스턴스 재부팅 
 
 
 

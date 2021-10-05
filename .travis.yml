@@ -22,7 +22,7 @@ notifications:
 
 #Travis VI에서 빌드하여 만든 Jar파일 -> S3 업로드
 before_deploy:
-  - zip -r springboot-webservice
+  - zip -r springboot-webservice *
   - mkdir -p deploy
   - mv springboot-webservice.zip delpoy/springboot-webservice.zip
 

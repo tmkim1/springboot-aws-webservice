@@ -266,8 +266,21 @@ notifications:
     recipients: 
       - 본인 메일 주소 
 ```
-ㅠㅕㅑ
 
+#Travis CI와 AWS S3 연동 
+S3란 AWS에서 제공하는 일종의 파일 서버 
+
+[AWS Key 발급]
+IAM: AWS에서 제공하는 서비스의 접근 방식과 권한을 관리 (Travis가 AWS에 접근 가능하도록 설정 필요)  
+  - 사용자 추가 (프로그래밍 방식 액세스, 기존 정책 직접 연결로 설정) 
+  - s3full, codeDeployFull 정책 체크
+
+생성된 키를 Travis 설정에 Environment Variable 항목에 추가 
+  - AWS_ACCESS_KEY
+  - AWS_SECRET_KEY
+
+S3 버킷 생성 (모든 퍼블릭 액세스 차단) 
+  
 
 
 

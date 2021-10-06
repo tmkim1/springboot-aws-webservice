@@ -14,12 +14,6 @@ cache:
 
 script: "./gradlew clean build"
 
-# CI 실행 완료 시 메일로 알람
-notifications:
-  email:
-    recipients:
-      - xxoals1021@naver.com
-
 #Travis VI에서 빌드하여 만든 Jar파일 -> S3 업로드
 before_deploy:
   - zip -r springboot-webservice *
@@ -44,6 +38,12 @@ deploy:
     key: springboot-webservice.zip
     bundle_type: zip #압축 확장자
     application: springboot-webservice
-    deployment_group: springboot-webservice
+    deployment_group: springboot-webservice-group
     region: ap-northeast-2
     wait-until-deployed: true
+
+# CI 실행 완료 시 메일로 알람
+notifications:
+  email:
+    recipients:
+      - xxoals1021@naver.com

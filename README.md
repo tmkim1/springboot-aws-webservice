@@ -5,7 +5,7 @@
 
 **@Entity**
 
-- 테이블과 리크될 클래스임을 나타낸다.
+- 테이블과 링크될 클래스임을 나타낸다.
 - 기본값으로 클래스의 카멜케이스 이름을 언더스코어 네이밍(_)으로 테이블 이름을 매칭한다.
 - ex) SalesManager.java -> sales_manager table
 
@@ -25,7 +25,7 @@
 - 문자열의 경우 VARCHAR(255)가 기본값이지만 사이즈를 500으로 늘리고 싶은 경우 등
 
 ```
-자바빈 규악을 생각하면서 getter/setter를 무작정 생서하는 경우,
+자바빈 규악을 생각하면서 getter/setter를 무작정 생성하는 경우,
 해당 클래스의 인스턴스 값들이 언제 어디서 변해야 하는지 코드상으로 명확하게 구분할 수가 없어, 차후 기능 변경 시 매우 복잡해진다.
 
 따라서 Entity 클래스에서는 절대 Setter 메소드를 만들지 않고,
@@ -366,10 +366,15 @@ files:
     key: springboot-webservice.zip
     bundle_type: zip #압축 확장자 
     application: springboot-webservice
-    deployment_group: springboot-webservice
+    deployment_group: springboot-webservice-group
     region: ap-northeast-2
     wait-until-deployed: true
 ```
+deploy fail 나는 경우 
+
+ec2 -> /var/log/aws/codedeploy-agent 해당 경로로 이동하여 로그 확인 
+
+# 배포 자동화 구성 
 
 
 

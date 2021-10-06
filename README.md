@@ -222,7 +222,7 @@ API 및 서비스 -> 사용자 인증 정보 -> OAuth 동의 화면 접속
 Callback URL: DNS 주소로 변경 
 ```
 
-#Travis CI 배포 자동화 
+# Travis CI 배포 자동화 
 
 [CI] 
 
@@ -309,6 +309,67 @@ deploy:
 IAM 역할 생성 (AWS 서비스 - EC2) 
 
 인스턴스 -> 보안 -> IAM 역할 수정 -> 인스턴스 재부팅 
+
+# Travis CI, S3, CodeDeploy 연동 
+
+1. CodeDeploy 에이전트 설치 
+
+``` shell
+aws s3 cp s3://aws-codedeploy-ap-northeast-2/latest/install . --region ap-northeast-2
+
+#실행 권한 부여
+chmod +x ./install
+
+#설치
+sudo ./install auto
+
+#상태 검사 
+sudo service codedeploy-agent status
+
+#아래와 같이 나온다면 정상
+The AWS CodeDeploy agent is running as PID 8782
+
+  루비가 없는 경우 ->  sudo yum install ruby
+
+```
+
+IAM 역할 생성 (AWS 서비스 - CodeDeploy) 
+- CodeDeploy: AWS의 배포 삼형제 중 하나 
+[배포 삼형제]
+- Code Commit: 깃허브와 같은 코드 저장소의 역할을 함
+- Code Build: Travis CI와 마찬가지로 빌드용 서비스, 규모가 있는 서비스에서는 대부분 젠킨스/팀시티 등을 이용하니 사용할 일이 거의 없음
+- CodeDeploy: aws의 배포 서비스, 다른 대채재가 없음, 오토 스케일링 그룹 배포 외 많은 기능을 지원 
+  
+``` shell
+#S3에 넘겨줄 zip 파일을 저장할 디렉토리 생성 
+mkdir ~/app/step2 && mkdir ~/app/step2/zip
+``` 
+
+
+AWS Code Deploy의 설정은 appspec.yml로 진행 
+
+```yml
+version: 0.0
+os: linux
+files:
+  - source: /
+      destination: /home/ec2-user/app/step2/zip/
+      overwrite: yes
+```
+
+.travis.yml <- CodeDeploy 내용 추가 
+```yml 
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY # Travis repo settings에 설정된 값
+    bucket: freelec-springboot-tm-build # S3 버킷
+    key: springboot-webservice.zip
+    bundle_type: zip #압축 확장자 
+    application: springboot-webservice
+    deployment_group: springboot-webservice
+    region: ap-northeast-2
+    wait-until-deployed: true
+```
 
 
 

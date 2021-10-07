@@ -376,6 +376,92 @@ ec2 -> /var/log/aws/codedeploy-agent 해당 경로로 이동하여 로그 확인
 
 # 배포 자동화 구성 
 
+[무중단 배포 방식]
+
+1. AWS 블루 그린(Blue-Green)
+2. 도커 웹 서비스 
+3. 엔진엑스 리버스 프록시 
+
+[엔진엑스 리버스 프록시]
+
+- 리버스 프록시란 외부의 요청을 받아 백엔드 서보로 요청을 전달하는 행위 
+- 엔진엑스를 이용하는 이유는 가장 저렴하고 쉽기 때문, 여유가 된다면 aws 블루 그린을 사용하면 됨
+
+[사용방법]
+
+- 기존에 쓰던 EC2에 그대로 적용하면 되므로 별도의 인스턴스가 필요하지 않음
+- 하나의 EC2 혹은 리눅스 서버에 엔진엑스 1대와 스프링 부트 Jar 2대를 사용)
+- 구조 
+  - 엔진엑스는 80(http), 443(https) 포트를 할당
+  - 스프링 부트1은 8081 포트로 실행
+  - 스프링 부트2는 8082 포트로 실행 
+- 운영 과정 
+  - 사용자는 서비스 주소로 접속한다(80 혹은 443)
+  - 엔진엑스는 사용자의 요청을 받아 현재 연결된 스프링 부트로 요청을 전달, ex) 스프링 부트1 (8081 포트)로 전달 가정
+  - 스프링 부트2는 엔진엑스와 연결된 상태가 아니니 요청받지 못함 
+  - 1.0 -> 1.1 버전으로 신규 배포가 필요하면, 엔진엑스와 연결되지 않은 스프링부트2(8082 포트)로 배포
+
+- 배포 과정
+  - 배포하는 동안에도 서비스는 중단되지 않는다 (엔진엑스는 스프링 부트1을 바라보기 때문)
+  - 배포가 끝나고 정상적으로 스프링 부트2가 구동 중인지 확인
+  - 스프링 부트2가 정상 구동 중이면 nginx reload 명령어를 통해 8081 대신에 8082를 바라보도록 
+  - nginx reload는 0.1초 이내에 완료 됨 
+
+[엔진엑스 설치와 스프링 부트 연동하기]
+
+``` shell
+#엔진엑스 설치
+sudo yum install nginx
+
+#Amazone Linux2인 경우
+sudo amazon-linux-extras install nginx1
+
+#엔진엑스 실행
+sudo service nginx start 
+
+```
+
+정상 작동 시 -> Starting nginx: [ OK ] or Redirecting to /bin/systemctl start nginx.service
+
+- AWS 보안 그룹 인바운드: Nginx가 사용하는 80포트 추가 
+
+[엔진엑스와 스프링 부트 연동] 
+
+엔진엑스가 현재 실행 중인 스프링 부트 프로젝트를 바라볼 수 있도록 프록시 설정 
+
+``` shell
+sudo vim /etc/nignx/nginx.conf
+
+#server 설정 -> location 영역 추가 
+server {
+        listen       80;
+        listen       [::]:80;
+        server_name  _;
+        root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location / {
+                proxy_pass http://localhost:8080;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header Host $http_host;
+        }
+
+        error_page 404 /404.html;
+        location = /404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+        }
+    }
+```
+
+
+
+
 
 
 
